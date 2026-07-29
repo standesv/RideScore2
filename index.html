@@ -1,0 +1,806 @@
+<!doctype html>
+<html lang="fr">
+<head>
+  <meta charset="utf-8"/>
+  <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover"/>
+  <meta name="theme-color" content="#070b16"/>
+  <title>RideScore — météo moto</title>
+  <link rel="preconnect" href="https://api.open-meteo.com"/>
+  <link rel="preconnect" href="https://geocoding-api.open-meteo.com"/>
+  <link rel="preconnect" href="https://fonts.googleapis.com"/>
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin/>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&family=Manrope:wght@700;800&display=swap" rel="stylesheet"/>
+  <style>
+    :root{
+      --bg-0:#060a15; --bg-1:#0b1226; --bg-2:#0f1830;
+      --panel:rgba(22,32,58,.55); --panel-solid:#121b34; --panel-border:rgba(255,255,255,.08);
+      --muted:#93a4c3; --muted-2:#6b7ba0;
+      --brand:#17c9bd; --brand-2:#4f8cff; --brand-ink:#04211f;
+      --ok:#2ee6a6; --warn:#ffb648; --err:#ff5470;
+      --text:#eef2fb;
+      --radius-lg:22px; --radius-md:16px; --radius-sm:12px;
+      --shadow-soft:0 10px 30px -12px rgba(0,0,0,.55);
+    }
+    *{box-sizing:border-box; -webkit-tap-highlight-color:transparent}
+    html,body{height:100%}
+    body{
+      margin:0;
+      font-family:'Inter',system-ui,-apple-system,Segoe UI,Roboto,Arial,sans-serif;
+      color:var(--text);
+      background:
+        radial-gradient(900px 500px at 12% -8%, rgba(79,140,255,.25), transparent 60%),
+        radial-gradient(800px 480px at 105% 8%, rgba(23,201,189,.18), transparent 55%),
+        radial-gradient(700px 600px at 50% 120%, rgba(255,86,112,.10), transparent 60%),
+        linear-gradient(180deg, var(--bg-0), var(--bg-1) 40%, var(--bg-2));
+      background-attachment:fixed;
+      min-height:100%;
+      -webkit-font-smoothing:antialiased;
+    }
+    a{color:inherit}
+
+    header{
+      position:sticky; top:0; z-index:20;
+      padding:calc(env(safe-area-inset-top,0px) + 16px) 16px 14px;
+      background:linear-gradient(180deg, rgba(6,10,21,.92), rgba(6,10,21,.55) 80%, transparent);
+      backdrop-filter:blur(14px); -webkit-backdrop-filter:blur(14px);
+    }
+    .header-brand{display:flex;gap:14px;align-items:center;justify-content:center}
+    .header-brand .logo-wrap{
+      position:relative; height:56px; width:56px; flex:none;
+      display:flex;align-items:center;justify-content:center;
+      border-radius:16px;
+      background:linear-gradient(145deg, rgba(23,201,189,.18), rgba(79,140,255,.10));
+      border:1px solid rgba(255,255,255,.10);
+      box-shadow:0 0 0 1px rgba(255,255,255,.02) inset, 0 8px 24px -10px rgba(23,201,189,.45);
+    }
+    .header-brand img{height:38px;width:auto;display:block;filter:drop-shadow(0 2px 6px rgba(0,0,0,.35))}
+    .header-brand .titles{text-align:left}
+    .header-brand h1{
+      margin:0;font-size:1.5rem;font-family:'Manrope',Inter,sans-serif;font-weight:800;
+      letter-spacing:-.02em;
+      background:linear-gradient(90deg,#eef2fb, #b9d4ff 65%, var(--brand));
+      -webkit-background-clip:text; background-clip:text; color:transparent;
+    }
+    .header-brand p{margin:2px 0 0;color:var(--muted);font-size:.82rem;font-weight:500}
+
+    .container{max-width:640px;margin:0 auto;padding:6px 14px 118px}
+
+    .card{
+      position:relative;
+      background:var(--panel);
+      border:1px solid var(--panel-border);
+      border-radius:var(--radius-lg);
+      padding:16px;
+      margin-top:14px;
+      box-shadow:var(--shadow-soft);
+      backdrop-filter:blur(18px); -webkit-backdrop-filter:blur(18px);
+      overflow:hidden;
+    }
+    .card::before{
+      content:'';position:absolute;inset:0;border-radius:inherit;padding:1px;
+      background:linear-gradient(140deg, rgba(255,255,255,.14), rgba(255,255,255,0) 40%);
+      -webkit-mask:linear-gradient(#fff 0 0) content-box, linear-gradient(#fff 0 0);
+      -webkit-mask-composite:xor; mask-composite:exclude; pointer-events:none;
+    }
+    .card h2{
+      margin:0 0 12px; font-size:.95rem; font-weight:700; letter-spacing:.01em;
+      color:#dbe4fb;
+      display:flex;align-items:center;gap:8px;
+    }
+
+    label{display:block;font-size:11.5px;font-weight:600;color:var(--muted);margin-bottom:6px;text-transform:uppercase;letter-spacing:.04em}
+    input{
+      width:100%;padding:12px 13px;border-radius:var(--radius-sm);
+      border:1px solid rgba(255,255,255,.10);
+      background:rgba(6,10,21,.55);
+      color:var(--text); font-size:15px; font-family:inherit;
+      transition:border-color .15s ease, box-shadow .15s ease, background .15s ease;
+    }
+    input::placeholder{color:var(--muted-2)}
+    input:focus{outline:none;border-color:var(--brand);box-shadow:0 0 0 3px rgba(23,201,189,.18);background:rgba(6,10,21,.75)}
+    input[type="date"]{color-scheme:dark}
+
+    button{border:0;border-radius:var(--radius-sm);padding:11px 14px;font-weight:700;cursor:pointer;font-family:inherit;font-size:14px;transition:transform .12s ease, filter .15s ease, box-shadow .15s ease}
+    button:active{transform:scale(.97)}
+
+    .row{display:flex;gap:10px;flex-wrap:wrap}.row>*{flex:1 1 160px}
+    .grid{display:grid;gap:10px}.three{grid-template-columns:1.2fr 1fr}
+    @media(max-width:520px){.three{grid-template-columns:1fr}}
+
+    .tabs{display:flex;gap:6px;background:rgba(6,10,21,.5);padding:4px;border-radius:999px;border:1px solid rgba(255,255,255,.08)}
+    .tabBtn{flex:1;background:transparent;color:var(--muted);border:0;padding:9px 10px;border-radius:999px;font-size:13.5px}
+    .tabBtn.active{background:linear-gradient(135deg, var(--brand), var(--brand-2));color:#04141a;box-shadow:0 6px 16px -6px rgba(23,201,189,.6)}
+
+    .results{display:grid;gap:6px;margin-top:8px}
+    .cityItem{
+      display:flex;justify-content:space-between;align-items:center;gap:8px;
+      padding:11px 12px;border-radius:var(--radius-sm);
+      background:rgba(6,10,21,.55);border:1px solid rgba(255,255,255,.08);color:#fff;cursor:pointer;
+      font-size:13.5px; text-align:left; transition:background .15s ease,border-color .15s ease;
+    }
+    .cityItem:hover, .cityItem:active{background:rgba(23,201,189,.12);border-color:rgba(23,201,189,.35)}
+    .cityItem span:last-child{font-family:ui-monospace,SFMono-Regular,Menlo,monospace;color:var(--muted);font-size:11.5px}
+
+    details{margin-top:8px}
+    summary{cursor:pointer;color:var(--muted);font-size:12.5px;font-weight:600;padding:4px 0}
+
+    .lamps{display:grid;grid-template-columns:repeat(auto-fit,minmax(150px,1fr));gap:8px}
+    .lamp{
+      display:flex;gap:9px;align-items:center;
+      background:rgba(6,10,21,.5);border:1px solid rgba(255,255,255,.08);
+      border-radius:var(--radius-sm);padding:10px 11px;font-size:13px;color:#d7e0f5;
+      transition:border-color .15s ease, background .15s ease;
+    }
+    .led{width:9px;height:9px;border-radius:50%;background:#334155;flex:none;box-shadow:0 0 0 3px rgba(255,255,255,.03)}
+    .on.green{background:var(--ok);box-shadow:0 0 10px 1px rgba(46,230,166,.75)}
+    .on.yellow{background:var(--warn);box-shadow:0 0 10px 1px rgba(255,182,72,.75)}
+    .on.red{background:var(--err);box-shadow:0 0 10px 1px rgba(255,84,112,.75)}
+
+    .muted{color:var(--muted)}
+
+    .stickyBar{
+      position:fixed;left:0;right:0;bottom:0;z-index:30;
+      display:flex;gap:10px;
+      padding:12px 14px calc(env(safe-area-inset-bottom,0px) + 12px);
+      background:linear-gradient(180deg, transparent, rgba(6,10,21,.75) 30%, rgba(6,10,21,.96));
+      backdrop-filter:blur(16px); -webkit-backdrop-filter:blur(16px);
+    }
+    .stickyBar button{flex:1;display:flex;align-items:center;justify-content:center;gap:6px;font-size:14.5px}
+    .stickyBar #btnGeo{background:rgba(255,255,255,.08);color:var(--text);border:1px solid rgba(255,255,255,.14)}
+    .stickyBar #btnPrimary{
+      background:linear-gradient(135deg, var(--brand), var(--brand-2));
+      color:#04141a; box-shadow:0 10px 24px -8px rgba(23,201,189,.55);
+    }
+    /* Laisse la place au bandeau publicitaire natif AdMob affiché en bas de l'app Android */
+    body.has-admob-banner .stickyBar{bottom:50px}
+    body.has-admob-banner .container{padding-bottom:172px}
+
+    .modepill{display:inline-flex;background:rgba(6,10,21,.55);border:1px solid rgba(255,255,255,.08);border-radius:999px;overflow:hidden;margin-top:10px;padding:3px}
+    .modepill button{background:transparent;border:0;padding:7px 13px;font-size:12px;color:var(--muted);cursor:pointer;border-radius:999px}
+    .modepill button.active{background:linear-gradient(135deg, var(--brand), var(--brand-2));color:#04141a;font-weight:700}
+
+    .gaugesRow{display:flex;gap:12px;margin-top:8px;flex-wrap:wrap;justify-content:center}
+    .gBox{
+      flex:1 1 150px;min-width:140px;text-align:center;
+      background:rgba(6,10,21,.4);border:1px solid rgba(255,255,255,.06);
+      border-radius:var(--radius-md);padding:12px 10px 14px;
+    }
+    .gBox p{margin:0 0 2px;font-size:12px;font-weight:600;letter-spacing:.02em;text-transform:uppercase;color:var(--muted)}
+    .gaugeSVG{width:150px;max-width:100%;height:auto;display:block;margin:0 auto;filter:drop-shadow(0 6px 14px rgba(0,0,0,.35))}
+    .guidance{color:#dbe4fb;font-size:12.5px;margin-top:2px;font-weight:600}
+
+    .kpiGrid{display:grid;grid-template-columns:repeat(auto-fit,minmax(140px,1fr));gap:10px;margin-top:2px}
+    .kpiCard{
+      background:rgba(6,10,21,.45);border:1px solid rgba(255,255,255,.07);
+      border-radius:var(--radius-sm);padding:11px 13px;display:flex;flex-direction:column;gap:5px;min-height:64px;
+      transition:border-color .15s ease, background .15s ease;
+    }
+    .kpiLabel{font-size:10.5px;color:var(--muted);text-transform:uppercase;letter-spacing:.05em;font-weight:700}
+    .kpiValue{font-size:1.2rem;font-weight:800;letter-spacing:-.01em;font-family:'Manrope',Inter,sans-serif}
+    .kpiSmall{font-size:10px;color:var(--muted-2);font-weight:600}
+    .hide{display:none!important}
+
+    #status, #statusRoute{font-size:12.5px;font-weight:500}
+    #dayMsg{font-size:13.5px;line-height:1.5}
+
+    ::-webkit-scrollbar{width:0;height:0}
+  </style>
+</head>
+<body>
+<header>
+  <div class="header-brand">
+    <div class="logo-wrap"><img src="ridescore-logo.png" alt="RideScore, météo moto"></div>
+    <div class="titles">
+      <h1>RideScore</h1>
+      <p>La météo pensée pour les motards</p>
+    </div>
+  </div>
+</header>
+
+<main class="container">
+  <!-- Sélection -->
+  <section class="card">
+    <h2>🏍️ Ville ou itinéraire</h2>
+    <div class="tabs">
+      <button id="tabSingle" class="tabBtn active">Ville</button>
+      <button id="tabRoute" class="tabBtn">Itinéraire</button>
+    </div>
+
+    <!-- mode ville -->
+    <div id="panelSingle" style="margin-top:10px">
+      <div class="modepill" id="modePill">
+        <button type="button" data-mode="day" class="active">Jour (moy.)</button>
+        <button type="button" data-mode="now">Temps réel</button>
+      </div>
+      <div class="grid three" style="margin-top:10px">
+        <div>
+          <label for="city">Ville</label>
+          <input id="city" placeholder="Ex. Paris…" autocomplete="off"/>
+          <div id="results" class="results"></div>
+        </div>
+        <div>
+          <label for="date">Date</label>
+          <input id="date" type="date"/>
+        </div>
+      </div>
+      <details>
+        <summary>Options avancées</summary>
+        <div class="row" style="margin-top:8px">
+          <div><label for="lat">Latitude</label><input id="lat" type="number" step="0.0001" placeholder="48.8566"/></div>
+          <div><label for="lon">Longitude</label><input id="lon" type="number" step="0.0001" placeholder="2.3522"/></div>
+        </div>
+      </details>
+      <p id="status" class="muted" style="margin:10px 0 0;"></p>
+    </div>
+
+    <!-- mode itinéraire -->
+    <div id="panelRoute" style="margin-top:10px;display:none">
+      <div class="modepill" id="modePillRoute">
+        <button type="button" data-mode="day" class="active">Jour (moy.)</button>
+        <button type="button" data-mode="now">Temps réel</button>
+      </div>
+      <div class="grid three" style="margin-top:10px">
+        <div>
+          <label for="cityA">Ville départ</label>
+          <input id="cityA" autocomplete="off"/>
+          <div id="resultsA" class="results"></div>
+        </div>
+        <div>
+          <label for="cityB">Ville arrivée</label>
+          <input id="cityB" autocomplete="off"/>
+          <div id="resultsB" class="results"></div>
+        </div>
+        <div>
+          <label for="dateRoute">Date</label>
+          <input id="dateRoute" type="date"/>
+        </div>
+      </div>
+      <p id="statusRoute" class="muted" style="margin:10px 0 0;"></p>
+    </div>
+  </section>
+
+  <!-- Voyants + jauges -->
+  <section class="card">
+    <h2>🧭 Score &amp; densité</h2>
+    <div class="gaugesRow">
+      <div class="gBox">
+        <p class="muted">Score météo</p>
+        <div id="gScore"></div>
+        <div id="gScoreTxt" class="guidance">—</div>
+      </div>
+      <div class="gBox">
+        <p class="muted">Densité de l’air</p>
+        <div id="gRho"></div>
+        <div id="gRhoTxt" class="guidance">—</div>
+      </div>
+    </div>
+    <div id="lamps" class="lamps" style="margin-top:14px"></div>
+  </section>
+
+  <!-- Phénomènes -->
+  <section class="card">
+    <h2>⛅ Phénomènes du jour</h2>
+    <p id="dayMsg" class="muted">—</p>
+  </section>
+
+  <!-- Détails -->
+  <section class="card">
+    <h2>📊 Détails</h2>
+    <div class="kpiGrid">
+      <div class="kpiCard"><div class="kpiLabel">Température</div><div class="kpiValue" id="kT">—</div></div>
+      <div class="kpiCard"><div class="kpiLabel">Humidité</div><div class="kpiValue" id="kRH">—</div></div>
+      <div class="kpiCard"><div class="kpiLabel">Vent / Rafales</div><div class="kpiValue" id="kWind">—</div></div>
+      <div class="kpiCard"><div class="kpiLabel">Précipitation</div><div class="kpiValue" id="kPrec">—</div></div>
+      <div class="kpiCard hide"><div class="kpiLabel">Pression</div><div class="kpiValue" id="kP">—</div></div>
+      <div class="kpiCard hide"><div class="kpiLabel">ρ (kg/m³)</div><div class="kpiValue" id="kRho">—</div></div>
+      <div class="kpiCard hide"><div class="kpiLabel">ρ/ρ₀</div><div class="kpiValue" id="kRatio">—</div></div>
+      <div class="kpiCard hide"><div class="kpiLabel">Source</div><div class="kpiValue kpiSmall" id="kTs">—</div></div>
+    </div>
+  </section>
+</main>
+
+<div class="stickyBar">
+  <button id="btnGeo">📍 Ma position</button>
+  <button id="btnPrimary">🔄 Évaluer</button>
+</div>
+
+<script>
+(function(){
+  'use strict';
+  const $=id=>document.getElementById(id);
+  const todayISO=()=>{const d=new Date();d.setMinutes(d.getMinutes()-d.getTimezoneOffset());return d.toISOString().slice(0,10)};
+  const isToday=iso=>iso===todayISO();
+  const fmt=(v,u="")=>(v==null||Number.isNaN(+v))?"—":`${(+v).toFixed(2)}${u}`;
+  const debounce=(fn,ms)=>{let t;return(...args)=>{clearTimeout(t);t=setTimeout(()=>fn(...args),ms);};};
+  const clamp=(v,min,max)=>Math.min(max,Math.max(min,v));
+  const polar=(cx,cy,r,aDeg)=>{const a=aDeg*Math.PI/180;return{x:cx+r*Math.cos(a),y:cy+r*Math.sin(a)}};
+
+  // densité d’air
+  function rhoFromTRP(T_C,RH,p_hPa){
+    if([T_C,RH,p_hPa].some(v=>v==null||isNaN(v))) return null;
+    const T_K=T_C+273.15;
+    const es=6.112*Math.exp(17.62*T_C/(243.12+T_C));
+    const e=(RH/100)*es;
+    const pd=p_hPa-e;
+    const R=8.314462618, Md=0.0289652, Mv=0.018016;
+    return ((pd*100)*Md+(e*100)*Mv)/(R*T_K);
+  }
+
+  // Jauge semi-circulaire SIMPLE (une seule couleur, cohérente avec le niveau)
+  function gaugeHalf(elId, value, vMin, vMax, color){
+    const el=$(elId); if(!el) return;
+    if(value==null||isNaN(value)){
+      el.innerHTML='<div class="guidance">—</div>';
+      return;
+    }
+    const t=(clamp(value,vMin,vMax)-vMin)/(vMax-vMin);
+    const size=200, cx=size/2, cy=size/2, R=88;
+    const arc=Math.PI*R;
+    const start=polar(cx,cy,R,-90);
+    const end=polar(cx,cy,R,90);
+    const ang=-90+180*t;
+    const tip=polar(cx,cy,R-10,ang);
+
+    el.innerHTML=`
+      <svg class="gaugeSVG" viewBox="0 0 ${size} ${size}">
+        <!-- fond -->
+        <path d="M ${start.x} ${start.y} A ${R} ${R} 0 0 1 ${end.x} ${end.y}"
+              fill="none" stroke="rgba(255,255,255,.18)" stroke-width="12"/>
+        <!-- arc coloré -->
+        <path d="M ${start.x} ${start.y} A ${R} ${R} 0 0 1 ${end.x} ${end.y}"
+              fill="none" stroke="${color}" stroke-width="12"
+              stroke-dasharray="${Math.max(1,arc)}"
+              stroke-dashoffset="${(1-t)*arc}"/>
+        <!-- aiguille -->
+        <line x1="${cx}" y1="${cy}" x2="${tip.x}" y2="${tip.y}"
+              stroke="#e5e7eb" stroke-width="4" stroke-linecap="round"/>
+        <circle cx="${cx}" cy="${cy}" r="5" fill="#e5e7eb"/>
+      </svg>
+    `;
+  }
+
+  // scoring
+  const scoreFromTemperature=T=> (T==null||isNaN(T))?12: (T>=10&&T<=25?25:((T>=5&&T<10)||(T>25&&T<=30)?15:5));
+  const scoreFromRain=p=> (p==null||isNaN(p))?12:(p===0?15:(p<1?8:0));
+  const scoreFromWind=(w,g)=>{const v=Math.max(w||0,g||0);return v<25?20:(v<50?10:0)};
+  const scoreFromRoadRisk=(T,RH,p)=> (T!=null&&T<=0&&(p>0||(RH!=null&&RH>80)))?0:((p>0&&p<1)||(RH!=null&&RH>90)?5:10);
+  const scoreFromBlackIce=(T,RH,p)=> (T==null||isNaN(T))?6: (T<=0&&(p>0||(RH!=null&&RH>=85))?0:(T<=2&&(p>0||(RH!=null&&RH>=90))?4:10));
+  const scoreFromFog=(vis,RH)=> (vis==null||isNaN(vis))?((RH!=null&&RH>95)?2:5):(vis<200?0:(vis<1000?2:(vis<4000?4:5)));
+  const scoreFromDensity=r=> (r==null||isNaN(r))?10: (r>=0.95&&r<=1.05?15:((r>=0.93&&r<0.95)||(r>1.05&&r<=1.07)?8:3));
+
+  function scoreHour({T,RH,P,W,G,R,V}){
+    const rho=rhoFromTRP(T,RH,P); const ratio=rho?rho/1.225:null;
+    return Math.round(Math.min(100,Math.max(0,
+      scoreFromTemperature(T)+scoreFromRain(R)+scoreFromWind(W,G)+scoreFromRoadRisk(T,RH,R)+scoreFromDensity(ratio)+scoreFromBlackIce(T,RH,R)+scoreFromFog(V,RH)
+    )));
+  }
+
+  function avgOnIdx(arr, idxs){ if(!arr) return null; let s=0,c=0; for(const i of idxs){ const v=arr[i]; if(v!=null){s+=v;c++;}} return c? s/c : null; }
+  const avg2=(a,b)=>a==null?b:(b==null?a:(a+b)/2);
+
+  function computeDaySummaryFromHourly(H, dateISO){
+    const times=H.time||[]; const idx=[];
+    for(let i=0;i<times.length;i++){ if(String(times[i]).startsWith(dateISO)) idx.push(i); }
+    if(idx.length===0) return null;
+    let maxWind=0,maxGust=0,maxPrec=0,minTemp=Infinity,minVis=Infinity,maxRH=0;
+    let rhoSum=0,rhoCount=0; let worstScore=100;
+    for(const i of idx){
+      const T=H.temperature_2m?.[i];
+      const RH=H.relative_humidity_2m?.[i];
+      const P=H.surface_pressure?.[i];
+      const W=H.wind_speed_10m?.[i];
+      const G=H.wind_gusts_10m?.[i];
+      const R=H.precipitation?.[i];
+      const V=H.visibility?.[i];
+      const r=rhoFromTRP(T,RH,P); if(r!=null){rhoSum+=r; rhoCount++;}
+      const s=scoreHour({T,RH,P,W,G,R,V}); worstScore=Math.min(worstScore,s);
+      maxWind=Math.max(maxWind,W||0); maxGust=Math.max(maxGust,G||0); maxPrec=Math.max(maxPrec,R||0);
+      if(T!=null) minTemp=Math.min(minTemp,T);
+      if(V!=null) minVis=Math.min(minVis,V);
+      if(RH!=null) maxRH=Math.max(maxRH,RH);
+    }
+    const rhoMean=rhoCount?(rhoSum/rhoCount):null;
+    const ratioMean=rhoMean?rhoMean/1.225:null;
+    const events=[];
+    if (maxPrec > 0) events.push('averses');
+    if (maxWind >= 25 || maxGust >= 50) events.push('vent');
+    if (minTemp <= 0) events.push('risque de verglas');
+    if ((minVis < 1000) || maxRH > 95) events.push('brouillard');
+    const Tmean=avgOnIdx(H.temperature_2m,idx);
+    const RHmean=avgOnIdx(H.relative_humidity_2m,idx);
+    const Pmean=avgOnIdx(H.surface_pressure,idx);
+    return {rhoMean,ratioMean,scoreDay:worstScore,events,Tmean,RHmean,Pmean,Wmax:maxWind,Gmax:maxGust,Rmax:maxPrec,Vmin:(minVis<Infinity?minVis:null)};
+  }
+
+  async function fetchCurrent(lat,lon){
+    const url=new URL('https://api.open-meteo.com/v1/meteofrance');
+    url.searchParams.set('latitude',lat);
+    url.searchParams.set('longitude',lon);
+    url.searchParams.set('timezone','auto');
+    url.searchParams.set('current',"temperature_2m,relative_humidity_2m,surface_pressure,wind_speed_10m,precipitation,visibility");
+    const r=await fetch(url.toString());
+    if(!r.ok) throw new Error('HTTP '+r.status);
+    return r.json();
+  }
+
+  function computeCurrentSummary(cur){
+    if(!cur) return null;
+    const T=cur.temperature_2m,RH=cur.relative_humidity_2m,P=cur.surface_pressure;
+    const W=cur.wind_speed_10m,G=cur.wind_gusts_10m,R=cur.precipitation,V=cur.visibility;
+    const rho=rhoFromTRP(T,RH,P); const ratio=rho?rho/1.225:null;
+    const score=scoreHour({T,RH,P,W,G,R,V});
+    const events=[];
+    if(R>0) events.push('averses');
+    if(W>=25 || G>=50) events.push('vent');
+    if(T<=0) events.push('risque de verglas');
+    if((V!=null && V<1000) || (RH!=null && RH>95)) events.push('brouillard');
+    return {rhoMean:rho,ratioMean:ratio,scoreDay:score,events,Tmean:T,RHmean:RH,Pmean:P,Wmax:W,Gmax:G,Rmax:R,Vmin:V,ts:cur.time};
+  }
+
+  function renderLamps({Tmean,RHmean,Rmax,Wmax,Gmax,Vmin}){
+    const cont=$("lamps"); if(!cont) return;
+    const T=Tmean,RH=RHmean,precip=Rmax,wind=Wmax,gust=Gmax,vis=Vmin;
+    const v=Math.max(wind||0,gust||0);
+    const verglas=(T!=null&&T<=1)&&((precip!=null&&precip>0)||(RH!=null&&RH>=90));
+    const fogDense=(vis!=null&&vis<200)||(RH!=null&&RH>98);
+    const fog=fogDense||(vis!=null&&vis<1000)||(RH!=null&&RH>95);
+    const gantsHiver=(T!=null && T<10);
+    const vesteChaude=(T!=null && T<15);
+    const lamps=[
+      {label:'Gants hiver', icon:'🧤', on:gantsHiver, tone:(T<5?'red':(T<10?'yellow':'green'))},
+      {label:'Gants été', icon:'🧤', on:!gantsHiver, tone:(T>30?'red':(T>25?'yellow':'green'))},
+      {label:'Veste chaude', icon:'🧥', on:vesteChaude, tone:(T<8?'red':(T<15?'yellow':'green'))},
+      {label:'Veste légère', icon:'🧥', on:!vesteChaude, tone:(T>28?'red':(T>20?'yellow':'green'))},
+      {label:'Pantalon pluie', icon:'👖', on:((precip!=null&&precip>0)||(RH!=null&&RH>80)), tone:(precip>=1?'red':'yellow')},
+      {label:'Chaussures étanches', icon:'👢', on:(precip!=null&&precip>=1), tone:(precip>=2?'red':'yellow')},
+      {label:'Attention vent', icon:'💨', on:(v>=25), tone:(v>50?'red':'yellow')},
+      {label:'Risque verglas', icon:'🧊', on:verglas, tone:(T!=null&&T<=0)?'red':'yellow'},
+      {label:'Brouillard', icon:'🌫️', on:fog, tone:(fogDense?'red':'yellow')},
+      {label:'Visière claire', icon:'🕶️', on:((RH!=null&&RH>95)||(precip!=null&&precip>0)), tone:'yellow'}
+    ];
+    cont.innerHTML=lamps.map(l=>`<div class="lamp"><span class="led ${l.on?('on '+l.tone):''}"></span><span>${l.icon} ${l.label}</span></div>`).join('');
+  }
+
+  async function fetchDay(lat,lon,dateISO){
+    const url=new URL('https://api.open-meteo.com/v1/meteofrance');
+    url.searchParams.set('latitude',lat);
+    url.searchParams.set('longitude',lon);
+    url.searchParams.set('timezone','auto');
+    url.searchParams.set('hourly',"temperature_2m,relative_humidity_2m,surface_pressure,wind_speed_10m,wind_gusts_10m,precipitation,visibility");
+    url.searchParams.set('start_date',dateISO);
+    url.searchParams.set('end_date',dateISO);
+    const r=await fetch(url.toString());
+    if(!r.ok) throw new Error('HTTP '+r.status);
+    return r.json();
+  }
+
+  let currentSingleMode='day';
+  let currentRouteMode='day';
+  let MODE='single';
+  let A=null,B=null;
+
+  function setSingleModePill(mode){
+    currentSingleMode=mode;
+    $("modePill").querySelectorAll('button').forEach(b=>b.classList.toggle('active', b.dataset.mode===mode));
+  }
+  function setRouteModePill(mode){
+    currentRouteMode=mode;
+    $("modePillRoute").querySelectorAll('button').forEach(b=>b.classList.toggle('active', b.dataset.mode===mode));
+  }
+
+  function updateDetailsUI(S,label){
+    $("kT").textContent=fmt(S.Tmean," °C");
+    $("kRH").textContent=fmt(S.RHmean," %");
+    $("kWind").textContent=(S.Wmax!=null?`${S.Wmax.toFixed(0)} km/h`:'—')+(S.Gmax!=null?` • raf ${S.Gmax.toFixed(0)} km/h`:'');
+
+    $("kPrec").textContent=(S.Rmax!=null?`${S.Rmax.toFixed(2)} mm`:'—');
+    $("kTs").textContent=label||'—';
+  }
+
+  function renderGaugesFromSummary(S, modeLabel, isRoute=false){
+    // SCORE MÉTÉO : 0–49 rouge, 50–79 orange, 80–100 vert
+    let scoreColor='#ef4444';
+    if(S.scoreDay>=80) scoreColor='#22c55e';
+    else if(S.scoreDay>=50) scoreColor='#f97316';
+
+    gaugeHalf('gScore', S.scoreDay, 0, 100, scoreColor);
+
+    $("gScoreTxt").textContent =
+      S.scoreDay>=80 ? (isRoute ? '🟢 Favorables (itinéraire)' : '🟢 Conditions favorables')
+      : S.scoreDay>=50 ? (isRoute ? '🟠 Mitigées (itinéraire)' : '🟠 Conditions mitigées')
+      : (isRoute ? '🔴 Défavorable (itinéraire)' : '🔴 Conditions défavorables');
+
+    // DENSITÉ DE L’AIR : léger vert, moyen jaune, dense rouge
+    const ratio=S.ratioMean;
+    let rhoColor='rgba(148,163,184,0.7)';
+    if(ratio!=null){
+      if(ratio<0.99) rhoColor='#22c55e';
+      else if(ratio<=1.03) rhoColor='#facc15';
+      else rhoColor='#ef4444';
+    }
+    gaugeHalf('gRho', ratio, 0.90, 1.08, rhoColor);
+
+    let rhoLabel='—';
+    if(ratio!=null){
+      if(ratio<0.99) rhoLabel='🟢 Air plutôt léger';
+      else if(ratio<=1.03) rhoLabel='🟡 Densité moyenne';
+      else rhoLabel='🔴 Air dense / riche';
+    }
+    $("gRhoTxt").textContent=rhoLabel;
+
+    if(S.events && S.events.length){
+      $("dayMsg").textContent=(modeLabel==='now'
+        ? (isRoute?'Phénomènes sur l’itinéraire : ':'Phénomènes actuels : ')
+        : (isRoute?'Phénomènes sur l’itinéraire : ':'Phénomènes attendus : ')
+      )+S.events.join(', ');
+    }else{
+      $("dayMsg").textContent=(modeLabel==='now'
+        ? (isRoute?'Aucun phénomène notable (itinéraire).':'Conditions actuelles calmes.')
+        : (isRoute?'Aucun phénomène notable (itinéraire).':'Aucun phénomène notable.')
+      );
+    }
+  }
+
+  async function loadCity(lat,lon,dateISO,mode){
+    const st=$("status"); if(st) st.textContent='Chargement…';
+    try{
+      const effectiveMode=(mode==='now' && !isToday(dateISO)) ? 'day' : mode;
+      let S,label;
+      if(effectiveMode==='now'){
+        const d=await fetchCurrent(lat,lon);
+        S=computeCurrentSummary(d.current);
+        label='Temps réel';
+      }else{
+        const d=await fetchDay(lat,lon,dateISO);
+        S=computeDaySummaryFromHourly(d.hourly||{},dateISO);
+        label=dateISO;
+      }
+      if(!S){ st.innerHTML='<span style="color:#ef4444">Pas de données.</span>'; return; }
+
+      updateDetailsUI(S,label);
+      renderGaugesFromSummary(S, effectiveMode, false);
+      renderLamps(S);
+
+      st.innerHTML=`✅ Données chargées pour ${effectiveMode==='now'?'maintenant':dateISO} (${lat.toFixed(4)}, ${lon.toFixed(4)})`;
+
+      if(mode==='now' && effectiveMode==='day') setSingleModePill('day');
+    }catch(e){
+      console.error(e);
+      $("status").innerHTML=`<span style="color:#ef4444">Échec : ${e.message}</span>`;
+    }
+  }
+
+  // recherche (avec auto-sélection possible du 1er résultat)
+  async function searchCityInto(inputId, resultsId, onPick, autoPickFirst=false){
+    const inputEl=$(inputId);
+    const q=(inputEl?.value||'').trim();
+    const cont=$(resultsId); if(cont) cont.innerHTML='';
+    const holder=(resultsId==='results') ? $("status") : $("statusRoute");
+    if(!q){
+      if(holder) holder.textContent='Saisissez une ville.';
+      return;
+    }
+    if(holder) holder.textContent='Recherche…';
+    try{
+      const u=new URL('https://geocoding-api.open-meteo.com/v1/search');
+      u.searchParams.set('name',q);
+      u.searchParams.set('count',8);
+      u.searchParams.set('language','fr');
+      u.searchParams.set('format','json');
+      const r=await fetch(u.toString());
+      if(!r.ok) throw new Error('HTTP '+r.status);
+      const d=await r.json();
+      const res=d.results||[];
+      if(res.length===0){
+        if(holder) holder.innerHTML='<span style="color:#ef4444">Aucun résultat.</span>';
+        return;
+      }
+      if(holder) holder.textContent=`Résultats : ${res.length}`;
+
+      if(autoPickFirst){
+        onPick(res[0]);
+        return;
+      }
+
+      for(const v of res){
+        const b=document.createElement('button');
+        b.type='button';
+        b.className='cityItem';
+        const admin=v.admin1?`, ${v.admin1}`:'';
+        b.innerHTML=`<span>${v.name}${admin} — ${v.country_code}</span><span style="font-family:monospace;color:#cbd5e1">${v.latitude.toFixed(4)}, ${v.longitude.toFixed(4)}</span>`;
+        b.onclick=()=>{ onPick(v); cont.innerHTML=''; };
+        cont.appendChild(b);
+      }
+    }catch(e){
+      console.error(e);
+      if(holder) holder.innerHTML=`<span style="color:#ef4444">Erreur recherche : ${e.message}</span>`;
+    }
+  }
+
+  $("city").addEventListener('input', debounce(()=>{
+    searchCityInto('city','results', v=>{
+      $("city").value=v.name;
+      $("lat").value=v.latitude.toFixed(4);
+      $("lon").value=v.longitude.toFixed(4);
+      const d=$("date").value || todayISO();
+      loadCity(v.latitude,v.longitude,d,currentSingleMode);
+    });
+  },300));
+
+  $("cityA").addEventListener('input', debounce(()=>{
+    searchCityInto('cityA','resultsA', v=>{
+      A={name:v.name,lat:v.latitude,lon:v.longitude};
+      $("cityA").value=v.name;
+      autoEvaluate();
+    });
+  },300));
+
+  $("cityB").addEventListener('input', debounce(()=>{
+    searchCityInto('cityB','resultsB', v=>{
+      B={name:v.name,lat:v.latitude,lon:v.longitude};
+      $("cityB").value=v.name;
+      autoEvaluate();
+    });
+  },300));
+
+  // onglets
+  $("tabSingle").addEventListener('click', ()=>{
+    MODE='single';
+    $("panelSingle").style.display='block';
+    $("panelRoute").style.display='none';
+    $("tabSingle").classList.add('active');
+    $("tabRoute").classList.remove('active');
+  });
+  $("tabRoute").addEventListener('click', ()=>{
+    MODE='route';
+    $("panelRoute").style.display='block';
+    $("panelSingle").style.display='none';
+    $("tabRoute").classList.add('active');
+    $("tabSingle").classList.remove('active');
+  });
+
+  $("modePill").addEventListener('click', e=>{
+    if(e.target && e.target.dataset && e.target.dataset.mode){
+      setSingleModePill(e.target.dataset.mode);
+      autoEvaluate();
+    }
+  });
+  $("modePillRoute").addEventListener('click', e=>{
+    if(e.target && e.target.dataset && e.target.dataset.mode){
+      setRouteModePill(e.target.dataset.mode);
+      autoEvaluate();
+    }
+  });
+
+  async function evaluateRoute(date){
+    const info=$("statusRoute");
+    if(!A||!B){
+      info.innerHTML='<span style="color:#ef4444">Choisissez départ et arrivée.</span>';
+      return;
+    }
+    info.textContent='Calcul itinéraire…';
+    try{
+      const mode=currentRouteMode;
+      const effectiveMode=(mode==='now' && !isToday(date)) ? 'day' : mode;
+      let SA,SB,label;
+      if(effectiveMode==='now'){
+        const [ca,cb]=await Promise.all([fetchCurrent(A.lat,A.lon), fetchCurrent(B.lat,B.lon)]);
+        SA=computeCurrentSummary(ca.current);
+        SB=computeCurrentSummary(cb.current);
+        label='Temps réel (itinéraire)';
+      }else{
+        const [da,db]=await Promise.all([fetchDay(A.lat,A.lon,date), fetchDay(B.lat,B.lon,date)]);
+        SA=computeDaySummaryFromHourly(da.hourly||{},date);
+        SB=computeDaySummaryFromHourly(db.hourly||{},date);
+        label=date+' (itinéraire)';
+      }
+      if(!SA||!SB){
+        info.innerHTML='<span style="color:#ef4444">Données indisponibles.</span>';
+        return;
+      }
+
+      const rhoAvg=avg2(SA.rhoMean,SB.rhoMean);
+      const ratioAvg=rhoAvg?rhoAvg/1.225:null;
+      const scoreAvg=avg2(SA.scoreDay,SB.scoreDay);
+
+      const Sagg={
+        scoreDay:scoreAvg,
+        ratioMean:ratioAvg,
+        events:Array.from(new Set([...(SA.events||[]), ...(SB.events||[])])),
+        Tmean:avg2(SA.Tmean,SB.Tmean),
+        RHmean:avg2(SA.RHmean,SB.RHmean),
+        Wmax:avg2(SA.Wmax,SB.Wmax),
+        Gmax:avg2(SA.Gmax,SB.Gmax),
+        Rmax:avg2(SA.Rmax,SB.Rmax),
+        Vmin:avg2(SA.Vmin,SB.Vmin)
+      };
+
+      renderGaugesFromSummary(Sagg, effectiveMode, true);
+      renderLamps(Sagg);
+
+      const avgWind=Math.round(Sagg.Wmax || 0);
+      const avgGust=Math.round(Sagg.Gmax || 0);
+      $("kT").textContent=fmt(Sagg.Tmean," °C");
+      $("kRH").textContent=fmt(Sagg.RHmean," %");
+      $("kWind").textContent=`${avgWind} km/h • raf ${avgGust} km/h`;
+      $("kPrec").textContent=(Sagg.Rmax!=null ? `${Sagg.Rmax.toFixed(2)} mm` : '—');
+      $("kTs").textContent=label;
+
+      info.innerHTML=`✅ Itinéraire évalué pour ${label}`;
+      if(mode==='now' && effectiveMode==='day') setRouteModePill('day');
+    }catch(e){
+      console.error(e);
+      $("statusRoute").innerHTML=`<span style="color:#ef4444">Échec : ${e.message}</span>`;
+    }
+  }
+
+  function autoEvaluate(){
+    if(MODE==='single'){
+      const la=parseFloat($("lat").value), lo=parseFloat($("lon").value);
+      const d=$("date").value || todayISO();
+      if(!isNaN(la)&&!isNaN(lo)) loadCity(la,lo,d,currentSingleMode);
+    }else{
+      const d=$("dateRoute").value || todayISO();
+      if(A&&B) evaluateRoute(d);
+    }
+  }
+
+  $("date").addEventListener('change', autoEvaluate);
+  $("dateRoute").addEventListener('change', autoEvaluate);
+
+  $("btnPrimary").addEventListener('click', async ()=>{
+    if(MODE==='single'){
+      let la=parseFloat($("lat").value), lo=parseFloat($("lon").value);
+      const d=$("date").value || todayISO();
+
+      // Si pas de lat/lon mais une ville saisie, on cherche automatiquement la 1ère correspondance
+      if((isNaN(la)||isNaN(lo)) && $("city").value.trim()){
+        await searchCityInto('city','results', v=>{
+          $("city").value=v.name;
+          $("lat").value=v.latitude.toFixed(4);
+          $("lon").value=v.longitude.toFixed(4);
+          la=v.latitude;
+          lo=v.longitude;
+        }, true);
+      }
+
+      if(isNaN(la)||isNaN(lo)){
+        $("status").textContent='Renseignez une ville (ou lat/lon).';
+        return;
+      }
+      loadCity(la,lo,d,currentSingleMode);
+    }else{
+      const d=$("dateRoute").value || todayISO();
+      evaluateRoute(d);
+    }
+  });
+
+  $("btnGeo").addEventListener('click', ()=>{
+    const st=$("status");
+    if(!navigator.geolocation){ st.textContent='Géolocalisation non supportée.'; return; }
+    st.textContent='Localisation…';
+    navigator.geolocation.getCurrentPosition(p=>{
+      const la=p.coords.latitude, lo=p.coords.longitude;
+      $("lat").value=la.toFixed(4); $("lon").value=lo.toFixed(4);
+      const d=$("date").value || todayISO();
+      loadCity(la,lo,d,currentSingleMode);
+    }, e=>{
+      st.textContent='Géolocalisation refusée : '+e.message;
+    }, {enableHighAccuracy:true,timeout:10000,maximumAge:60000});
+  });
+
+  // init
+  document.addEventListener('DOMContentLoaded', ()=>{
+    const d=todayISO();
+    $("date").value=d;
+    $("dateRoute").value=d;
+    const la=48.8566, lo=2.3522;
+    $("lat").value=la.toFixed(4); $("lon").value=lo.toFixed(4);
+    $("status").textContent='🟢 Démo : Paris chargé (moyenne journée).';
+    loadCity(la,lo,d,'day');
+  });
+})();
+</script>
+
+</body>
+</html>
