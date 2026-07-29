@@ -4,5 +4,5 @@
     <string name="title_activity_main">RideScore</string>
     <string name="package_name">com.standesv.ridescore</string>
     <string name="custom_url_scheme">com.standesv.ridescore</string>
-    <string name="admob_app_id">ca-app-pub-3209259150498249~9615019143</string>
+    <string name="admob_app_id">ca-app-pub-3209259150498249~5353314274</string>
 </resources>
