@@ -1,4 +1,4 @@
-package com.standesv.ridescore;
+package com.ridescore.myapp;
 
 import com.getcapacitor.BridgeActivity;
 
