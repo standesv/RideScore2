@@ -248,7 +248,7 @@
     <div class="logo-wrap"><img src="ridescore-logo.png" alt="RideScore, météo moto"></div>
     <div class="titles">
       <h1>RideScore</h1>
-      <p>La météo pensée pour les motards</p>
+      <p data-i18n="tagline">La météo pensée pour les motards</p>
     </div>
   </div>
 </header>
@@ -278,9 +278,9 @@
       </div>
       <div class="hero-side">
         <div class="hero-verdict" id="heroVerdict">—</div>
-        <div class="hero-events" id="heroEvents">Renseigne une ville pour commencer.</div>
+        <div class="hero-events" id="heroEvents" data-i18n="heroEventsDefault">Renseigne une ville pour commencer.</div>
         <div class="hero-mini">
-          <div class="hero-chip"><span id="heroRhoDot">🟦</span><span id="heroRhoTxt">Densité —</span></div>
+          <div class="hero-chip"><span id="heroRhoDot">🟦</span><span id="heroRhoTxt" data-i18n="heroRhoDefault">Densité —</span></div>
         </div>
       </div>
     </div>
@@ -288,34 +288,34 @@
 
   <!-- Sélection -->
   <section class="card">
-    <h2><span class="ico">🏍️</span>Ville ou itinéraire</h2>
+    <h2><span class="ico">🏍️</span><span data-i18n="sectionSelect">Ville ou itinéraire</span></h2>
     <div class="tabs">
-      <button id="tabSingle" class="tabBtn active">Ville</button>
-      <button id="tabRoute" class="tabBtn">Itinéraire</button>
+      <button id="tabSingle" class="tabBtn active" data-i18n="tabCity">Ville</button>
+      <button id="tabRoute" class="tabBtn" data-i18n="tabRoute">Itinéraire</button>
     </div>
 
     <!-- mode ville -->
     <div id="panelSingle" style="margin-top:10px">
       <div class="modepill" id="modePill">
-        <button type="button" data-mode="day" class="active">Jour (moy.)</button>
-        <button type="button" data-mode="now">Temps réel</button>
+        <button type="button" data-mode="day" class="active" data-i18n="modeDay">Jour (moy.)</button>
+        <button type="button" data-mode="now" data-i18n="modeNow">Temps réel</button>
       </div>
       <div class="grid three" style="margin-top:10px">
         <div>
-          <label for="city">Ville</label>
-          <input id="city" placeholder="Ex. Paris…" autocomplete="off"/>
+          <label for="city" data-i18n="labelCity">Ville</label>
+          <input id="city" placeholder="Ex. Paris…" autocomplete="off" data-i18n-placeholder="placeholderCity"/>
           <div id="results" class="results"></div>
         </div>
         <div>
-          <label for="date">Date</label>
+          <label for="date" data-i18n="labelDate">Date</label>
           <input id="date" type="date"/>
         </div>
       </div>
       <details>
-        <summary>Options avancées</summary>
+        <summary data-i18n="advancedOptions">Options avancées</summary>
         <div class="row" style="margin-top:8px">
-          <div><label for="lat">Latitude</label><input id="lat" type="number" step="0.0001" placeholder="48.8566"/></div>
-          <div><label for="lon">Longitude</label><input id="lon" type="number" step="0.0001" placeholder="2.3522"/></div>
+          <div><label for="lat" data-i18n="labelLat">Latitude</label><input id="lat" type="number" step="0.0001" placeholder="48.8566"/></div>
+          <div><label for="lon" data-i18n="labelLon">Longitude</label><input id="lon" type="number" step="0.0001" placeholder="2.3522"/></div>
         </div>
       </details>
       <p id="status" class="muted" style="margin:10px 0 0;"></p>
@@ -324,22 +324,22 @@
     <!-- mode itinéraire -->
     <div id="panelRoute" style="margin-top:10px;display:none">
       <div class="modepill" id="modePillRoute">
-        <button type="button" data-mode="day" class="active">Jour (moy.)</button>
-        <button type="button" data-mode="now">Temps réel</button>
+        <button type="button" data-mode="day" class="active" data-i18n="modeDay">Jour (moy.)</button>
+        <button type="button" data-mode="now" data-i18n="modeNow">Temps réel</button>
       </div>
       <div class="grid three" style="margin-top:10px">
         <div>
-          <label for="cityA">Ville départ</label>
+          <label for="cityA" data-i18n="labelCityStart">Ville départ</label>
           <input id="cityA" autocomplete="off"/>
           <div id="resultsA" class="results"></div>
         </div>
         <div>
-          <label for="cityB">Ville arrivée</label>
+          <label for="cityB" data-i18n="labelCityEnd">Ville arrivée</label>
           <input id="cityB" autocomplete="off"/>
           <div id="resultsB" class="results"></div>
         </div>
         <div>
-          <label for="dateRoute">Date</label>
+          <label for="dateRoute" data-i18n="labelDate">Date</label>
           <input id="dateRoute" type="date"/>
         </div>
       </div>
@@ -349,22 +349,22 @@
 
   <!-- Voyants -->
   <section class="card">
-    <h2><span class="ico">🎽</span>Équipement recommandé</h2>
+    <h2><span class="ico">🎽</span><span data-i18n="sectionEquip">Équipement recommandé</span></h2>
     <div id="lamps" class="lamps"></div>
   </section>
 
   <!-- Détails -->
   <section class="card">
-    <h2><span class="ico">📊</span>Détails</h2>
+    <h2><span class="ico">📊</span><span data-i18n="sectionDetails">Détails</span></h2>
     <div class="kpiGrid">
-      <div class="kpiCard"><div class="kpiTop"><span class="kpiIcon">🌡️</span><div class="kpiLabel">Température</div></div><div class="kpiValue" id="kT">—</div></div>
-      <div class="kpiCard"><div class="kpiTop"><span class="kpiIcon">💧</span><div class="kpiLabel">Humidité</div></div><div class="kpiValue" id="kRH">—</div></div>
-      <div class="kpiCard"><div class="kpiTop"><span class="kpiIcon">💨</span><div class="kpiLabel">Vent / Rafales</div></div><div class="kpiValue" id="kWind">—</div></div>
-      <div class="kpiCard"><div class="kpiTop"><span class="kpiIcon">🌧️</span><div class="kpiLabel">Précipitation</div></div><div class="kpiValue" id="kPrec">—</div></div>
-      <div class="kpiCard hide"><div class="kpiTop"><span class="kpiIcon">⏱️</span><div class="kpiLabel">Pression</div></div><div class="kpiValue" id="kP">—</div></div>
-      <div class="kpiCard hide"><div class="kpiTop"><span class="kpiIcon">🧪</span><div class="kpiLabel">ρ (kg/m³)</div></div><div class="kpiValue" id="kRho">—</div></div>
-      <div class="kpiCard hide"><div class="kpiTop"><span class="kpiIcon">🧪</span><div class="kpiLabel">ρ/ρ₀</div></div><div class="kpiValue" id="kRatio">—</div></div>
-      <div class="kpiCard hide"><div class="kpiTop"><span class="kpiIcon">🕒</span><div class="kpiLabel">Source</div></div><div class="kpiValue kpiSmall" id="kTs">—</div></div>
+      <div class="kpiCard"><div class="kpiTop"><span class="kpiIcon">🌡️</span><div class="kpiLabel" data-i18n="kpiTemp">Température</div></div><div class="kpiValue" id="kT">—</div></div>
+      <div class="kpiCard"><div class="kpiTop"><span class="kpiIcon">💧</span><div class="kpiLabel" data-i18n="kpiHum">Humidité</div></div><div class="kpiValue" id="kRH">—</div></div>
+      <div class="kpiCard"><div class="kpiTop"><span class="kpiIcon">💨</span><div class="kpiLabel" data-i18n="kpiWind">Vent / Rafales</div></div><div class="kpiValue" id="kWind">—</div></div>
+      <div class="kpiCard"><div class="kpiTop"><span class="kpiIcon">🌧️</span><div class="kpiLabel" data-i18n="kpiPrec">Précipitation</div></div><div class="kpiValue" id="kPrec">—</div></div>
+      <div class="kpiCard hide"><div class="kpiTop"><span class="kpiIcon">⏱️</span><div class="kpiLabel" data-i18n="kpiPressure">Pression</div></div><div class="kpiValue" id="kP">—</div></div>
+      <div class="kpiCard hide"><div class="kpiTop"><span class="kpiIcon">🧪</span><div class="kpiLabel" data-i18n="kpiRho">ρ (kg/m³)</div></div><div class="kpiValue" id="kRho">—</div></div>
+      <div class="kpiCard hide"><div class="kpiTop"><span class="kpiIcon">🧪</span><div class="kpiLabel" data-i18n="kpiRatio">ρ/ρ₀</div></div><div class="kpiValue" id="kRatio">—</div></div>
+      <div class="kpiCard hide"><div class="kpiTop"><span class="kpiIcon">🕒</span><div class="kpiLabel" data-i18n="kpiSource">Source</div></div><div class="kpiValue kpiSmall" id="kTs">—</div></div>
     </div>
   </section>
 
@@ -378,8 +378,8 @@
 
 <div class="stickyBar">
   <div class="stickyBar-inner">
-    <button id="btnGeo" title="Ma position">📍</button>
-    <button id="btnPrimary">🔄 Évaluer</button>
+    <button id="btnGeo" title="Ma position" data-i18n-title="btnGeoTitle">📍</button>
+    <button id="btnPrimary" data-i18n="btnEvaluate">🔄 Évaluer</button>
   </div>
 </div>
 
@@ -393,6 +393,110 @@
   const debounce=(fn,ms)=>{let t;return(...args)=>{clearTimeout(t);t=setTimeout(()=>fn(...args),ms);};};
   const clamp=(v,min,max)=>Math.min(max,Math.max(min,v));
   const polar=(cx,cy,r,aDeg)=>{const a=aDeg*Math.PI/180;return{x:cx+r*Math.cos(a),y:cy+r*Math.sin(a)}};
+
+  // ---- i18n : détection de la langue du téléphone (FR par défaut, EN sinon) ----
+  const LANG = (function(){
+    const nav = (navigator.language || navigator.userLanguage || 'fr').toLowerCase();
+    return nav.startsWith('fr') ? 'fr' : 'en';
+  })();
+  const I18N = {
+    fr: {
+      tagline:"La météo pensée pour les motards",
+      sectionSelect:"Ville ou itinéraire",
+      tabCity:"Ville", tabRoute:"Itinéraire",
+      modeDay:"Jour (moy.)", modeNow:"Temps réel",
+      labelCity:"Ville", labelDate:"Date",
+      placeholderCity:"Ex. Paris…",
+      labelLat:"Latitude", labelLon:"Longitude",
+      labelCityStart:"Ville départ", labelCityEnd:"Ville arrivée",
+      advancedOptions:"Options avancées",
+      sectionEquip:"Équipement recommandé",
+      sectionDetails:"Détails",
+      kpiTemp:"Température", kpiHum:"Humidité", kpiWind:"Vent / Rafales", kpiPrec:"Précipitation",
+      kpiPressure:"Pression", kpiRho:"ρ (kg/m³)", kpiRatio:"ρ/ρ₀", kpiSource:"Source",
+      btnGeoTitle:"Ma position", btnEvaluate:"🔄 Évaluer",
+      heroEventsDefault:"Renseigne une ville pour commencer.",
+      heroRhoDefault:"Densité —",
+      badgeToday:"Aujourd’hui", badgeLive:"Temps réel",
+      verdictGood:"Conditions favorables", verdictMid:"Conditions mitigées", verdictBad:"Conditions défavorables",
+      eventsPrefixRoute:"Phénomènes sur l’itinéraire : ", eventsPrefixNow:"Phénomènes actuels : ", eventsPrefixDay:"Phénomènes attendus : ",
+      noEventsRoute:"Aucun phénomène notable (itinéraire).", noEventsNow:"Conditions actuelles calmes.", noEventsDay:"Aucun phénomène notable.",
+      rhoLight:"Air léger", rhoMedium:"Densité moyenne", rhoDense:"Air dense",
+      eventRain:"averses", eventWind:"vent", eventIce:"risque de verglas", eventFog:"brouillard",
+      lampWinterGloves:"Gants hiver", lampSummerGloves:"Gants été", lampWarmJacket:"Veste chaude",
+      lampLightJacket:"Veste légère", lampRainPants:"Pantalon pluie", lampWaterproofShoes:"Chaussures étanches",
+      lampWindWarning:"Attention vent", lampIceRisk:"Risque verglas", lampFog:"Brouillard", lampClearVisor:"Visière claire",
+      statusLoading:"Chargement…", statusNoData:"Pas de données.",
+      statusLoadedNow:"✅ Données chargées pour maintenant ({lat}, {lon})",
+      statusLoadedDate:"✅ Données chargées pour {date} ({lat}, {lon})",
+      statusFail:"Échec : {msg}",
+      enterCity:"Saisissez une ville.", searching:"Recherche…", noResults:"Aucun résultat.",
+      resultsCount:"Résultats : {n}", searchError:"Erreur recherche : {msg}",
+      enterCityOrLatLon:"Renseignez une ville (ou lat/lon).",
+      geoNotSupported:"Géolocalisation non supportée.", locating:"Localisation…", geoDenied:"Géolocalisation refusée : {msg}",
+      demoLoaded:"🟢 Démo : Paris chargé (moyenne journée).",
+      chooseStartEnd:"Choisissez départ et arrivée.", computingRoute:"Calcul itinéraire…",
+      noDataRoute:"Données indisponibles.", routeEvaluated:"✅ Itinéraire évalué pour {label}",
+      currentPosition:"Position actuelle", routeLabel:"Itinéraire", routeSuffix:"itinéraire",
+      pageTitle:"RideScore — météo moto"
+    },
+    en: {
+      tagline:"Weather designed for motorcyclists",
+      sectionSelect:"City or route",
+      tabCity:"City", tabRoute:"Route",
+      modeDay:"Day (avg.)", modeNow:"Live",
+      labelCity:"City", labelDate:"Date",
+      placeholderCity:"E.g. Paris…",
+      labelLat:"Latitude", labelLon:"Longitude",
+      labelCityStart:"Start city", labelCityEnd:"Destination city",
+      advancedOptions:"Advanced options",
+      sectionEquip:"Recommended gear",
+      sectionDetails:"Details",
+      kpiTemp:"Temperature", kpiHum:"Humidity", kpiWind:"Wind / Gusts", kpiPrec:"Precipitation",
+      kpiPressure:"Pressure", kpiRho:"ρ (kg/m³)", kpiRatio:"ρ/ρ₀", kpiSource:"Source",
+      btnGeoTitle:"My location", btnEvaluate:"🔄 Evaluate",
+      heroEventsDefault:"Enter a city to get started.",
+      heroRhoDefault:"Density —",
+      badgeToday:"Today", badgeLive:"Live",
+      verdictGood:"Favorable conditions", verdictMid:"Mixed conditions", verdictBad:"Unfavorable conditions",
+      eventsPrefixRoute:"Route conditions: ", eventsPrefixNow:"Current conditions: ", eventsPrefixDay:"Expected conditions: ",
+      noEventsRoute:"No notable conditions (route).", noEventsNow:"Current conditions are calm.", noEventsDay:"No notable conditions.",
+      rhoLight:"Light air", rhoMedium:"Medium density", rhoDense:"Dense air",
+      eventRain:"rain showers", eventWind:"wind", eventIce:"risk of ice", eventFog:"fog",
+      lampWinterGloves:"Winter gloves", lampSummerGloves:"Summer gloves", lampWarmJacket:"Warm jacket",
+      lampLightJacket:"Light jacket", lampRainPants:"Rain pants", lampWaterproofShoes:"Waterproof boots",
+      lampWindWarning:"Wind warning", lampIceRisk:"Ice risk", lampFog:"Fog", lampClearVisor:"Clear visor",
+      statusLoading:"Loading…", statusNoData:"No data.",
+      statusLoadedNow:"✅ Data loaded for now ({lat}, {lon})",
+      statusLoadedDate:"✅ Data loaded for {date} ({lat}, {lon})",
+      statusFail:"Failed: {msg}",
+      enterCity:"Enter a city.", searching:"Searching…", noResults:"No results.",
+      resultsCount:"Results: {n}", searchError:"Search error: {msg}",
+      enterCityOrLatLon:"Enter a city (or lat/lon).",
+      geoNotSupported:"Geolocation not supported.", locating:"Locating…", geoDenied:"Geolocation denied: {msg}",
+      demoLoaded:"🟢 Demo: Paris loaded (daily average).",
+      chooseStartEnd:"Choose a start and destination.", computingRoute:"Calculating route…",
+      noDataRoute:"Data unavailable.", routeEvaluated:"✅ Route evaluated for {label}",
+      currentPosition:"Current location", routeLabel:"Route", routeSuffix:"route",
+      pageTitle:"RideScore — motorcycle weather"
+    }
+  };
+  function t(key, vars){
+    let s = (I18N[LANG] && I18N[LANG][key]) || I18N.fr[key] || key;
+    if(vars) for(const k in vars) s = s.split('{'+k+'}').join(vars[k]);
+    return s;
+  }
+  function applyStaticI18n(){
+    document.documentElement.lang = LANG;
+    document.title = t('pageTitle');
+    document.querySelectorAll('[data-i18n]').forEach(el=>{ el.textContent = t(el.getAttribute('data-i18n')); });
+    document.querySelectorAll('[data-i18n-placeholder]').forEach(el=>{ el.placeholder = t(el.getAttribute('data-i18n-placeholder')); });
+    document.querySelectorAll('[data-i18n-title]').forEach(el=>{ el.title = t(el.getAttribute('data-i18n-title')); });
+  }
+  function translateEvents(list){
+    const map = {'averses':t('eventRain'), 'vent':t('eventWind'), 'risque de verglas':t('eventIce'), 'brouillard':t('eventFog')};
+    return (list||[]).map(e=>map[e]||e);
+  }
 
   // densité d’air
   function rhoFromTRP(T_C,RH,p_hPa){
@@ -473,42 +577,37 @@
     setRing('ringScore', S.scoreDay, 0, 100, scoreColor);
     const sv=$("heroScore"); if(sv) sv.textContent = (S.scoreDay==null||isNaN(S.scoreDay)) ? '—' : Math.round(S.scoreDay);
     const em=$("heroEmoji"); if(em) em.textContent = pickHeroEmoji(S);
-    const badge=$("heroBadge"); if(badge) badge.textContent = badgeLabel || (modeLabel==='now' ? 'Temps réel' : 'Aujourd’hui');
+    const badge=$("heroBadge"); if(badge) badge.textContent = badgeLabel || (modeLabel==='now' ? t('badgeLive') : t('badgeToday'));
 
     const verdict=$("heroVerdict");
     if(verdict){
-      verdict.textContent = S.scoreDay>=80 ? 'Conditions favorables'
-        : S.scoreDay>=50 ? 'Conditions mitigées'
-        : 'Conditions défavorables';
+      verdict.textContent = S.scoreDay>=80 ? t('verdictGood')
+        : S.scoreDay>=50 ? t('verdictMid')
+        : t('verdictBad');
       verdict.style.color = S.scoreDay>=80 ? 'var(--ok)' : (S.scoreDay>=50 ? 'var(--warn)' : 'var(--err)');
     }
     const evEl=$("heroEvents");
     if(evEl){
       if(S.events && S.events.length){
-        evEl.textContent=(modeLabel==='now'
-          ? (isRoute?'Phénomènes sur l’itinéraire : ':'Phénomènes actuels : ')
-          : (isRoute?'Phénomènes sur l’itinéraire : ':'Phénomènes attendus : ')
-        )+S.events.join(', ');
+        const prefix = isRoute ? t('eventsPrefixRoute') : (modeLabel==='now' ? t('eventsPrefixNow') : t('eventsPrefixDay'));
+        evEl.textContent = prefix + translateEvents(S.events).join(', ');
       }else{
-        evEl.textContent=(modeLabel==='now'
-          ? (isRoute?'Aucun phénomène notable (itinéraire).':'Conditions actuelles calmes.')
-          : (isRoute?'Aucun phénomène notable (itinéraire).':'Aucun phénomène notable.')
-        );
+        evEl.textContent = isRoute ? t('noEventsRoute') : (modeLabel==='now' ? t('noEventsNow') : t('noEventsDay'));
       }
     }
     const ratio=S.ratioMean;
     const rhoTxt=$("heroRhoTxt"), rhoDot=$("heroRhoDot");
     if(ratio==null){
-      if(rhoTxt) rhoTxt.textContent='Densité —';
+      if(rhoTxt) rhoTxt.textContent=t('heroRhoDefault');
       if(rhoDot) rhoDot.textContent='⬜';
     }else if(ratio<0.99){
-      if(rhoTxt) rhoTxt.textContent='Air léger';
+      if(rhoTxt) rhoTxt.textContent=t('rhoLight');
       if(rhoDot) rhoDot.textContent='🟩';
     }else if(ratio<=1.03){
-      if(rhoTxt) rhoTxt.textContent='Densité moyenne';
+      if(rhoTxt) rhoTxt.textContent=t('rhoMedium');
       if(rhoDot) rhoDot.textContent='🟨';
     }else{
-      if(rhoTxt) rhoTxt.textContent='Air dense';
+      if(rhoTxt) rhoTxt.textContent=t('rhoDense');
       if(rhoDot) rhoDot.textContent='🟥';
     }
   }
@@ -601,16 +700,16 @@
     const gantsHiver=(T!=null && T<10);
     const vesteChaude=(T!=null && T<15);
     const lamps=[
-      {label:'Gants hiver', icon:'🧤', on:gantsHiver, tone:(T<5?'red':(T<10?'yellow':'green'))},
-      {label:'Gants été', icon:'🧤', on:!gantsHiver, tone:(T>30?'red':(T>25?'yellow':'green'))},
-      {label:'Veste chaude', icon:'🧥', on:vesteChaude, tone:(T<8?'red':(T<15?'yellow':'green'))},
-      {label:'Veste légère', icon:'🧥', on:!vesteChaude, tone:(T>28?'red':(T>20?'yellow':'green'))},
-      {label:'Pantalon pluie', icon:'👖', on:((precip!=null&&precip>0)||(RH!=null&&RH>80)), tone:(precip>=1?'red':'yellow')},
-      {label:'Chaussures étanches', icon:'👢', on:(precip!=null&&precip>=1), tone:(precip>=2?'red':'yellow')},
-      {label:'Attention vent', icon:'💨', on:(v>=25), tone:(v>50?'red':'yellow')},
-      {label:'Risque verglas', icon:'🧊', on:verglas, tone:(T!=null&&T<=0)?'red':'yellow'},
-      {label:'Brouillard', icon:'🌫️', on:fog, tone:(fogDense?'red':'yellow')},
-      {label:'Visière claire', icon:'🕶️', on:((RH!=null&&RH>95)||(precip!=null&&precip>0)), tone:'yellow'}
+      {label:t('lampWinterGloves'), icon:'🧤', on:gantsHiver, tone:(T<5?'red':(T<10?'yellow':'green'))},
+      {label:t('lampSummerGloves'), icon:'🧤', on:!gantsHiver, tone:(T>30?'red':(T>25?'yellow':'green'))},
+      {label:t('lampWarmJacket'), icon:'🧥', on:vesteChaude, tone:(T<8?'red':(T<15?'yellow':'green'))},
+      {label:t('lampLightJacket'), icon:'🧥', on:!vesteChaude, tone:(T>28?'red':(T>20?'yellow':'green'))},
+      {label:t('lampRainPants'), icon:'👖', on:((precip!=null&&precip>0)||(RH!=null&&RH>80)), tone:(precip>=1?'red':'yellow')},
+      {label:t('lampWaterproofShoes'), icon:'👢', on:(precip!=null&&precip>=1), tone:(precip>=2?'red':'yellow')},
+      {label:t('lampWindWarning'), icon:'💨', on:(v>=25), tone:(v>50?'red':'yellow')},
+      {label:t('lampIceRisk'), icon:'🧊', on:verglas, tone:(T!=null&&T<=0)?'red':'yellow'},
+      {label:t('lampFog'), icon:'🌫️', on:fog, tone:(fogDense?'red':'yellow')},
+      {label:t('lampClearVisor'), icon:'🕶️', on:((RH!=null&&RH>95)||(precip!=null&&precip>0)), tone:'yellow'}
     ];
     cont.innerHTML=lamps.map(l=>`<div class="lamp ${l.on?('is-on tone-'+l.tone):''}"><span class="lampIcon">${l.icon}</span><span>${l.label}</span></div>`).join('');
   }
@@ -697,33 +796,35 @@
   }
 
   async function loadCity(lat,lon,dateISO,mode){
-    const st=$("status"); if(st) st.textContent='Chargement…';
+    const st=$("status"); if(st) st.textContent=t('statusLoading');
     try{
       const effectiveMode=(mode==='now' && !isToday(dateISO)) ? 'day' : mode;
       let S,label;
       if(effectiveMode==='now'){
         const d=await fetchCurrent(lat,lon);
         S=computeCurrentSummary(d.current);
-        label='Temps réel';
+        label=t('badgeLive');
       }else{
         const d=await fetchDay(lat,lon,dateISO);
         S=computeDaySummaryFromHourly(d.hourly||{},dateISO);
         label=dateISO;
       }
-      if(!S){ st.innerHTML='<span style="color:#ef4444">Pas de données.</span>'; return; }
+      if(!S){ st.innerHTML=`<span style="color:#ef4444">${t('statusNoData')}</span>`; return; }
 
       updateDetailsUI(S,label);
       renderGaugesFromSummary(S, effectiveMode, false);
       renderLamps(S);
 
-      const cityLabel=($("city") && $("city").value.trim()) ? $("city").value.trim() : 'Position actuelle';
-      setHeroPlace(cityLabel, effectiveMode==='now' ? 'Temps réel' : dateISO);
-      st.innerHTML=`✅ Données chargées pour ${effectiveMode==='now'?'maintenant':dateISO} (${lat.toFixed(4)}, ${lon.toFixed(4)})`;
+      const cityLabel=($("city") && $("city").value.trim()) ? $("city").value.trim() : t('currentPosition');
+      setHeroPlace(cityLabel, effectiveMode==='now' ? t('badgeLive') : dateISO);
+      st.innerHTML = effectiveMode==='now'
+        ? t('statusLoadedNow', {lat:lat.toFixed(4), lon:lon.toFixed(4)})
+        : t('statusLoadedDate', {date:dateISO, lat:lat.toFixed(4), lon:lon.toFixed(4)});
 
       if(mode==='now' && effectiveMode==='day') setSingleModePill('day');
     }catch(e){
       console.error(e);
-      $("status").innerHTML=`<span style="color:#ef4444">Échec : ${e.message}</span>`;
+      $("status").innerHTML=`<span style="color:#ef4444">${t('statusFail',{msg:e.message})}</span>`;
     }
   }
 
@@ -734,25 +835,25 @@
     const cont=$(resultsId); if(cont) cont.innerHTML='';
     const holder=(resultsId==='results') ? $("status") : $("statusRoute");
     if(!q){
-      if(holder) holder.textContent='Saisissez une ville.';
+      if(holder) holder.textContent=t('enterCity');
       return;
     }
-    if(holder) holder.textContent='Recherche…';
+    if(holder) holder.textContent=t('searching');
     try{
       const u=new URL('https://geocoding-api.open-meteo.com/v1/search');
       u.searchParams.set('name',q);
       u.searchParams.set('count',8);
-      u.searchParams.set('language','fr');
+      u.searchParams.set('language',LANG);
       u.searchParams.set('format','json');
       const r=await fetch(u.toString());
       if(!r.ok) throw new Error('HTTP '+r.status);
       const d=await r.json();
       const res=d.results||[];
       if(res.length===0){
-        if(holder) holder.innerHTML='<span style="color:#ef4444">Aucun résultat.</span>';
+        if(holder) holder.innerHTML=`<span style="color:#ef4444">${t('noResults')}</span>`;
         return;
       }
-      if(holder) holder.textContent=`Résultats : ${res.length}`;
+      if(holder) holder.textContent=t('resultsCount',{n:res.length});
 
       if(autoPickFirst){
         onPick(res[0]);
@@ -770,7 +871,7 @@
       }
     }catch(e){
       console.error(e);
-      if(holder) holder.innerHTML=`<span style="color:#ef4444">Erreur recherche : ${e.message}</span>`;
+      if(holder) holder.innerHTML=`<span style="color:#ef4444">${t('searchError',{msg:e.message})}</span>`;
     }
   }
 
@@ -832,10 +933,10 @@
   async function evaluateRoute(date){
     const info=$("statusRoute");
     if(!A||!B){
-      info.innerHTML='<span style="color:#ef4444">Choisissez départ et arrivée.</span>';
+      info.innerHTML=`<span style="color:#ef4444">${t('chooseStartEnd')}</span>`;
       return;
     }
-    info.textContent='Calcul itinéraire…';
+    info.textContent=t('computingRoute');
     try{
       const mode=currentRouteMode;
       const effectiveMode=(mode==='now' && !isToday(date)) ? 'day' : mode;
@@ -844,15 +945,15 @@
         const [ca,cb]=await Promise.all([fetchCurrent(A.lat,A.lon), fetchCurrent(B.lat,B.lon)]);
         SA=computeCurrentSummary(ca.current);
         SB=computeCurrentSummary(cb.current);
-        label='Temps réel (itinéraire)';
+        label=t('badgeLive')+' ('+t('routeSuffix')+')';
       }else{
         const [da,db]=await Promise.all([fetchDay(A.lat,A.lon,date), fetchDay(B.lat,B.lon,date)]);
         SA=computeDaySummaryFromHourly(da.hourly||{},date);
         SB=computeDaySummaryFromHourly(db.hourly||{},date);
-        label=date+' (itinéraire)';
+        label=date+' ('+t('routeSuffix')+')';
       }
       if(!SA||!SB){
-        info.innerHTML='<span style="color:#ef4444">Données indisponibles.</span>';
+        info.innerHTML=`<span style="color:#ef4444">${t('noDataRoute')}</span>`;
         return;
       }
 
@@ -883,12 +984,12 @@
       $("kPrec").textContent=(Sagg.Rmax!=null ? `${Sagg.Rmax.toFixed(2)} mm` : '—');
       $("kTs").textContent=label;
 
-      setHeroPlace((A && B) ? (A.name+' → '+B.name) : 'Itinéraire', effectiveMode==='now' ? 'Temps réel' : date);
-      info.innerHTML=`✅ Itinéraire évalué pour ${label}`;
+      setHeroPlace((A && B) ? (A.name+' → '+B.name) : t('routeLabel'), effectiveMode==='now' ? t('badgeLive') : date);
+      info.innerHTML=t('routeEvaluated',{label});
       if(mode==='now' && effectiveMode==='day') setRouteModePill('day');
     }catch(e){
       console.error(e);
-      $("statusRoute").innerHTML=`<span style="color:#ef4444">Échec : ${e.message}</span>`;
+      $("statusRoute").innerHTML=`<span style="color:#ef4444">${t('statusFail',{msg:e.message})}</span>`;
     }
   }
 
@@ -923,7 +1024,7 @@
       }
 
       if(isNaN(la)||isNaN(lo)){
-        $("status").textContent='Renseignez une ville (ou lat/lon).';
+        $("status").textContent=t('enterCityOrLatLon');
         return;
       }
       loadCity(la,lo,d,currentSingleMode);
@@ -935,26 +1036,27 @@
 
   $("btnGeo").addEventListener('click', ()=>{
     const st=$("status");
-    if(!navigator.geolocation){ st.textContent='Géolocalisation non supportée.'; return; }
-    st.textContent='Localisation…';
+    if(!navigator.geolocation){ st.textContent=t('geoNotSupported'); return; }
+    st.textContent=t('locating');
     navigator.geolocation.getCurrentPosition(p=>{
       const la=p.coords.latitude, lo=p.coords.longitude;
       $("lat").value=la.toFixed(4); $("lon").value=lo.toFixed(4);
       const d=$("date").value || todayISO();
       loadCity(la,lo,d,currentSingleMode);
     }, e=>{
-      st.textContent='Géolocalisation refusée : '+e.message;
+      st.textContent=t('geoDenied',{msg:e.message});
     }, {enableHighAccuracy:true,timeout:10000,maximumAge:60000});
   });
 
   // init
   document.addEventListener('DOMContentLoaded', ()=>{
+    applyStaticI18n();
     const d=todayISO();
     $("date").value=d;
     $("dateRoute").value=d;
     const la=48.8566, lo=2.3522;
     $("lat").value=la.toFixed(4); $("lon").value=lo.toFixed(4);
-    $("status").textContent='🟢 Démo : Paris chargé (moyenne journée).';
+    $("status").textContent=t('demoLoaded');
     loadCity(la,lo,d,'day');
   });
 })();
