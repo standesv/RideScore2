@@ -1,0 +1,69 @@
+name: Build RideScore iOS (Simulator preview)
+
+# Génère un aperçu de l'app iOS exécutable dans le Simulateur Xcode (macOS uniquement).
+# Ceci N'EST PAS un .ipa installable sur un iPhone réel : Apple exige une signature
+# délivrée via un compte Apple Developer Program (payant, voir README/INSTRUCTIONS.md)
+# pour tout build destiné à un appareil physique ou à l'App Store.
+
+on:
+  workflow_dispatch: {}
+
+jobs:
+  build:
+    runs-on: macos-15
+    defaults:
+      run:
+        working-directory: mobile-app
+
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Setup Node
+        uses: actions/setup-node@v4
+        with:
+          node-version: 20
+
+      - name: Install JS dependencies
+        run: npm install
+
+      - name: Add iOS platform
+        run: npx cap add ios
+
+      - name: Configure Info.plist (AdMob + App Tracking Transparency)
+        run: |
+          IOS_INFO="ios/App/App/Info.plist"
+          /usr/libexec/PlistBuddy -c "Add :GADApplicationIdentifier string ca-app-pub-3209259150498249~5353314274" "$IOS_INFO"
+          /usr/libexec/PlistBuddy -c "Add :NSUserTrackingUsageDescription string 'Cette autorisation permet d'afficher des publicités plus pertinentes pour vous.'" "$IOS_INFO"
+          /usr/libexec/PlistBuddy -c "Add :SKAdNetworkItems array" "$IOS_INFO"
+          /usr/libexec/PlistBuddy -c "Add :SKAdNetworkItems:0 dict" "$IOS_INFO"
+          /usr/libexec/PlistBuddy -c "Add :SKAdNetworkItems:0:SKAdNetworkIdentifier string cstr6suwn9.skadnetwork" "$IOS_INFO"
+
+      - name: Sync Capacitor iOS project
+        run: npx cap sync ios
+
+      - name: Install CocoaPods dependencies
+        working-directory: mobile-app/ios/App
+        run: pod install --repo-update
+
+      - name: Build for iOS Simulator (unsigned)
+        working-directory: mobile-app/ios/App
+        run: |
+          xcodebuild build \
+            -workspace App.xcworkspace \
+            -scheme App \
+            -configuration Release \
+            -sdk iphonesimulator \
+            -derivedDataPath build \
+            CODE_SIGNING_ALLOWED=NO
+
+      - name: Package .app for download
+        working-directory: mobile-app/ios/App/build/Build/Products/Release-iphonesimulator
+        run: zip -r RideScore-ios-simulator.zip App.app
+
+      - name: Upload artifact
+        uses: actions/upload-artifact@v4
+        with:
+          name: RideScore-ios-simulator
+          path: mobile-app/ios/App/build/Build/Products/Release-iphonesimulator/RideScore-ios-simulator.zip
+          retention-days: 30
