@@ -19,3 +19,20 @@
 # If you keep the line number information, uncomment this to
 # hide the original source file name.
 #-renamesourcefileattribute SourceFile
+
+# --- Règles nécessaires avec minifyEnabled/shrinkResources activés ---
+# Capacitor (bridge WebView + plugins natifs)
+-keep class com.getcapacitor.** { *; }
+-keep public class * extends com.getcapacitor.Plugin
+-keep @com.getcapacitor.annotation.CapacitorPlugin public class * { *; }
+-keepclassmembers class * extends com.getcapacitor.Plugin { *; }
+
+# Google Mobile Ads / AdMob
+-keep class com.google.android.gms.ads.** { *; }
+-keep class com.google.ads.** { *; }
+-keep class com.google.android.gms.internal.ads.** { *; }
+
+# WebView <-> JS bridge (Capacitor utilise l'introspection JS)
+-keepclassmembers class * {
+  @android.webkit.JavascriptInterface <methods>;
+}
