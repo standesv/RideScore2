@@ -434,7 +434,7 @@
       resultsCount:"Résultats : {n}", searchError:"Erreur recherche : {msg}",
       enterCityOrLatLon:"Renseignez une ville (ou lat/lon).",
       geoNotSupported:"Géolocalisation non supportée.", locating:"Localisation…", geoDenied:"Géolocalisation refusée : {msg}",
-      demoLoaded:"🟢 Démo : Paris chargé (moyenne journée).",
+      geoDeniedInit:"Géolocalisation indisponible — renseigne une ville ou un itinéraire ci-dessous pour commencer.",
       chooseStartEnd:"Choisissez départ et arrivée.", computingRoute:"Calcul itinéraire…",
       noDataRoute:"Données indisponibles.", routeEvaluated:"✅ Itinéraire évalué pour {label}",
       currentPosition:"Position actuelle", routeLabel:"Itinéraire", routeSuffix:"itinéraire",
@@ -474,7 +474,7 @@
       resultsCount:"Results: {n}", searchError:"Search error: {msg}",
       enterCityOrLatLon:"Enter a city (or lat/lon).",
       geoNotSupported:"Geolocation not supported.", locating:"Locating…", geoDenied:"Geolocation denied: {msg}",
-      demoLoaded:"🟢 Demo: Paris loaded (daily average).",
+      geoDeniedInit:"Location unavailable — enter a city or route below to get started.",
       chooseStartEnd:"Choose a start and destination.", computingRoute:"Calculating route…",
       noDataRoute:"Data unavailable.", routeEvaluated:"✅ Route evaluated for {label}",
       currentPosition:"Current location", routeLabel:"Route", routeSuffix:"route",
@@ -621,6 +621,20 @@
   const scoreFromFog=(vis,RH)=> (vis==null||isNaN(vis))?((RH!=null&&RH>95)?2:5):(vis<200?0:(vis<1000?2:(vis<4000?4:5)));
   const scoreFromDensity=r=> (r==null||isNaN(r))?10: (r>=0.95&&r<=1.05?15:((r>=0.93&&r<0.95)||(r>1.05&&r<=1.07)?8:3));
 
+  // Garde-fou : un phénomène pénalisant annoncé sur la période ne doit jamais laisser
+  // le score atteindre 100, même par arrondi ou effet de moyenne/minimum.
+  function capScoreForEvents(score, events){
+    if(score==null||isNaN(score)) return score;
+    let cap=100;
+    if(events && events.length){
+      if(events.includes('averses')) cap=Math.min(cap,95);
+      if(events.includes('vent')) cap=Math.min(cap,92);
+      if(events.includes('brouillard')) cap=Math.min(cap,90);
+      if(events.includes('risque de verglas')) cap=Math.min(cap,70);
+    }
+    return Math.min(score,cap);
+  }
+
   function scoreHour({T,RH,P,W,G,R,V}){
     const rho=rhoFromTRP(T,RH,P); const ratio=rho?rho/1.225:null;
     return Math.round(Math.min(100,Math.max(0,
@@ -659,10 +673,11 @@
     if (maxWind >= 25 || maxGust >= 50) events.push('vent');
     if (minTemp <= 0) events.push('risque de verglas');
     if ((minVis < 1000) || maxRH > 95) events.push('brouillard');
+    const scoreDay=capScoreForEvents(worstScore, events);
     const Tmean=avgOnIdx(H.temperature_2m,idx);
     const RHmean=avgOnIdx(H.relative_humidity_2m,idx);
     const Pmean=avgOnIdx(H.surface_pressure,idx);
-    return {rhoMean,ratioMean,scoreDay:worstScore,events,Tmean,RHmean,Pmean,Wmax:maxWind,Gmax:maxGust,Rmax:maxPrec,Vmin:(minVis<Infinity?minVis:null)};
+    return {rhoMean,ratioMean,scoreDay,events,Tmean,RHmean,Pmean,Wmax:maxWind,Gmax:maxGust,Rmax:maxPrec,Vmin:(minVis<Infinity?minVis:null)};
   }
 
   async function fetchCurrent(lat,lon){
@@ -687,7 +702,8 @@
     if(W>=25 || G>=50) events.push('vent');
     if(T<=0) events.push('risque de verglas');
     if((V!=null && V<1000) || (RH!=null && RH>95)) events.push('brouillard');
-    return {rhoMean:rho,ratioMean:ratio,scoreDay:score,events,Tmean:T,RHmean:RH,Pmean:P,Wmax:W,Gmax:G,Rmax:R,Vmin:V,ts:cur.time};
+    const scoreDay=capScoreForEvents(score, events);
+    return {rhoMean:rho,ratioMean:ratio,scoreDay,events,Tmean:T,RHmean:RH,Pmean:P,Wmax:W,Gmax:G,Rmax:R,Vmin:V,ts:cur.time};
   }
 
   function renderLamps({Tmean,RHmean,Rmax,Wmax,Gmax,Vmin}){
@@ -1034,9 +1050,14 @@
     }
   });
 
+  function showGeoError(msg){
+    const st=$("status");
+    if(st) st.innerHTML=`<span style="color:#ef4444">${msg}</span>`;
+  }
+
   $("btnGeo").addEventListener('click', ()=>{
     const st=$("status");
-    if(!navigator.geolocation){ st.textContent=t('geoNotSupported'); return; }
+    if(!navigator.geolocation){ showGeoError(t('geoNotSupported')); return; }
     st.textContent=t('locating');
     navigator.geolocation.getCurrentPosition(p=>{
       const la=p.coords.latitude, lo=p.coords.longitude;
@@ -1044,20 +1065,31 @@
       const d=$("date").value || todayISO();
       loadCity(la,lo,d,currentSingleMode);
     }, e=>{
-      st.textContent=t('geoDenied',{msg:e.message});
+      showGeoError(t('geoDenied',{msg:e.message}));
     }, {enableHighAccuracy:true,timeout:10000,maximumAge:60000});
   });
 
-  // init
+  // init — géolocalise automatiquement l'utilisateur au lancement ; si l'autorisation
+  // est refusée ou indisponible, invite (en rouge) à renseigner une ville/un itinéraire.
+  function initGeoOrPrompt(){
+    if(!navigator.geolocation){ showGeoError(t('geoNotSupported')); return; }
+    $("status").textContent=t('locating');
+    navigator.geolocation.getCurrentPosition(p=>{
+      const la=p.coords.latitude, lo=p.coords.longitude;
+      $("lat").value=la.toFixed(4); $("lon").value=lo.toFixed(4);
+      const d=$("date").value || todayISO();
+      loadCity(la,lo,d,currentSingleMode);
+    }, e=>{
+      showGeoError(t('geoDeniedInit',{msg:e.message}));
+    }, {enableHighAccuracy:true,timeout:10000,maximumAge:60000});
+  }
+
   document.addEventListener('DOMContentLoaded', ()=>{
     applyStaticI18n();
     const d=todayISO();
     $("date").value=d;
     $("dateRoute").value=d;
-    const la=48.8566, lo=2.3522;
-    $("lat").value=la.toFixed(4); $("lon").value=lo.toFixed(4);
-    $("status").textContent=t('demoLoaded');
-    loadCity(la,lo,d,'day');
+    initGeoOrPrompt();
   });
 })();
 </script>
