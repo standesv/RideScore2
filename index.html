@@ -5,6 +5,14 @@
   <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover"/>
   <meta name="theme-color" content="#050810"/>
   <title>RideScore — météo moto</title>
+  <!-- PWA : installation sur iPhone (Safari > Partager > Sur l'écran d'accueil) et Android/Chrome -->
+  <link rel="manifest" href="manifest.json"/>
+  <link rel="apple-touch-icon" href="icon-180.png"/>
+  <link rel="icon" type="image/png" sizes="512x512" href="icon-512.png"/>
+  <meta name="apple-mobile-web-app-capable" content="yes"/>
+  <meta name="mobile-web-app-capable" content="yes"/>
+  <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent"/>
+  <meta name="apple-mobile-web-app-title" content="RideScore"/>
   <link rel="preconnect" href="https://api.open-meteo.com"/>
   <link rel="preconnect" href="https://geocoding-api.open-meteo.com"/>
   <link rel="preconnect" href="https://fonts.googleapis.com"/>
@@ -1091,6 +1099,13 @@
     $("dateRoute").value=d;
     initGeoOrPrompt();
   });
+
+  // PWA : enregistre le service worker (coquille en cache, installable sur iPhone/Android)
+  if('serviceWorker' in navigator){
+    window.addEventListener('load', ()=>{
+      navigator.serviceWorker.register('sw.js').catch(()=>{});
+    });
+  }
 })();
 </script>
 
