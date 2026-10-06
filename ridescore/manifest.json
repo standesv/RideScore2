@@ -1,0 +1,17 @@
+{
+  "name": "RideScore — météo moto",
+  "short_name": "RideScore",
+  "description": "La météo pensée pour les motards : score de conditions de roulage, équipement recommandé, densité de l'air.",
+  "start_url": "./?source=pwa",
+  "scope": "./",
+  "display": "standalone",
+  "orientation": "portrait",
+  "background_color": "#050810",
+  "theme_color": "#050810",
+  "lang": "fr",
+  "icons": [
+    { "src": "icon-192.png", "sizes": "192x192", "type": "image/png", "purpose": "any" },
+    { "src": "icon-512.png", "sizes": "512x512", "type": "image/png", "purpose": "any" },
+    { "src": "icon-512-maskable.png", "sizes": "512x512", "type": "image/png", "purpose": "maskable" }
+  ]
+}
